@@ -457,8 +457,8 @@ jobs:
         run: |
           echo "My test experiment" > report.md
           # cml-tensorboard-dev --md --title 'goto to TB' --logdir logs --name 'My Experiment' --description 'This is my test experiment' >> report.md
-          cml-publish.js assets/test.svg --md --title 'my logo' >> report.md
-          cml-publish.js assets/test.pdf --md --title 'my file' >> report.md
+          cml-publish assets/test.svg --md --title 'my logo' >> report.md
+          cml-publish assets/test.pdf --md --title 'my file' >> report.md
           cml-send-comment report.md
 
           echo "This must be seen in gitlab" >> report.md
