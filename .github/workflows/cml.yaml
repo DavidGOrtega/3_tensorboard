@@ -397,6 +397,7 @@ jobs:
     container: docker://davidgortega/cml:contexts
 
     steps:
+      - uses: actions/checkout@v2
       - name: deploy
         shell: bash
         env:
