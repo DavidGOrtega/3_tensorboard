@@ -432,27 +432,32 @@ jobs:
   #         cml-send-comment report.md
   #         echo "Trained!"
 
-  hello:
-    runs-on: [self-hosted, test,unregister]
-    steps:
-      - uses: actions/checkout@v2
+  # hello:
+  #   runs-on: [self-hosted, test,unregister]
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: cml_run
-        env:
-          repo_token: ${{ secrets.GITHUB_TOKEN }} 
-        run: |
-          echo "hello world from branch!" > report.md
-          cml-send-comment report.md
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "hello world from branch!" > report.md
+  #         cml-send-comment report.md
 
-  hello2:
+  cml-tests:
     runs-on: [ubuntu-latest]
-    container: docker://dvcorg/cml:latest
+    container: docker://davidgortega/cml:contexts
     steps:
       - uses: actions/checkout@v2
 
       - name: cml_run
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }} 
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }} 
         run: |
-          echo "hello world from branch!" > report.md
+          echo "My test experiment" > report.md
+          cml-tensorboard-dev --md --title 'goto to TB' --logdir logs --name 'My Experiment' --description 'This is my test experiment' >> report.md
+          cml-publish.js assets/test.svg --md --title 'my logo' >> report.md
+          cml-publish.js assets/test.pdf --md --title 'my file' >> report.md
           cml-send-comment report.md
+          cml-send-comment --repo https://gitlab.com/DavidGOrtega/3_tensorboard --token $GITLAB_TOKEN report.md 
