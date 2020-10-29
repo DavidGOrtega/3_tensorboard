@@ -456,8 +456,10 @@ jobs:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }} 
         run: |
           echo "My test experiment" > report.md
-          cml-tensorboard-dev --md --title 'goto to TB' --logdir logs --name 'My Experiment' --description 'This is my test experiment' >> report.md
+          # cml-tensorboard-dev --md --title 'goto to TB' --logdir logs --name 'My Experiment' --description 'This is my test experiment' >> report.md
           cml-publish.js assets/test.svg --md --title 'my logo' >> report.md
           cml-publish.js assets/test.pdf --md --title 'my file' >> report.md
           cml-send-comment report.md
-          cml-send-comment --repo https://gitlab.com/DavidGOrtega/3_tensorboard --token $GITLAB_TOKEN report.md 
+
+          echo "This must be seen in gitlab" >> report.md
+          cml-send-comment --repo https://gitlab.com/DavidGOrtega/3_tensorboard --token $GITLAB_TOKEN --commit-sha 2dc250a9 report.md 
