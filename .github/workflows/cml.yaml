@@ -394,10 +394,13 @@ jobs:
         
   deploy-tf:
     runs-on: [ubuntu-latest]
-    container: docker://davidgortega/cml:contexts
+    # container: docker://davidgortega/cml:contexts
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: iterative/setup-cml@v1
+
       - name: deploy
         shell: bash
         env:
