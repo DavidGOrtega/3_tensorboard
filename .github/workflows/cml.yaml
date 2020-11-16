@@ -1,15 +1,406 @@
-name: cml-cloud-runner-example
+name: train-my-model
 
 on: [push]
 
-jobs:    
+jobs:
+  # deploy-azure-gpu:
+  #   runs-on: [ubuntu-latest]
+  #   container: docker://davidgortega/cml:tf3
+
+  #   steps:
+  #     - name: deploy
+  #       shell: bash
+  #       env:
+  #         repo_token: ${{ secrets.REPO_TOKEN }} 
+  #         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  #         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  #         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #       run: |
+  #         echo "Deploying..."
+
+  #         RUNNER_LABELS="azure"
+  #         RUNNER_REPO="https://github.com/DavidGOrtega/3_tensorboard"
+  #         MACHINE="cml$(date +%s)"
+
+  #         docker-machine create \
+  #           --driver azure \
+  #           --azure-client-id $AZURE_CLIENT_ID \
+  #           --azure-client-secret $AZURE_CLIENT_SECRET \
+  #           --azure-subscription-id $AZURE_SUBSCRIPTION_ID \
+  #           --azure-location "eastus" \
+  #           --azure-resource-group $MACHINE \
+  #           --azure-size "Standard_NC6" \
+  #           --azure-image Canonical:UbuntuServer:18.04-LTS:latest \
+  #           $MACHINE
+
+  #         eval "$(docker-machine env --shell sh $MACHINE)"
+
+  #         (
+  #         docker-machine ssh $MACHINE "sudo mkdir -p /docker_machine && sudo chmod 777 /docker_machine" && \
+  #         docker-machine scp -r -q ~/.docker/machine/ $MACHINE:/docker_machine && \
+
+          
+  #         # docker-machine ssh $MACHINE "sudo apt update && sudo apt install -y ubuntu-drivers-common && sudo ubuntu-drivers autoinstall" && \
+
+  #         # docker-machine restart $MACHINE && \
+  #         # eval "$(docker-machine env --shell sh $MACHINE)" && \
+
+  #         # docker-machine ssh $MACHINE "curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - && curl -s -L https://nvidia.github.io/nvidia-docker/ubuntu18.04/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list && sudo apt update && sudo apt install -y nvidia-container-toolkit && sudo systemctl restart docker" && \
+
+  #         docker run --name runner --gpus all -d \
+  #           -v /docker_machine/machine:/root/.docker/machine \
+  #           -e DOCKER_MACHINE=$MACHINE \
+  #           -e repo_token=$repo_token \
+  #           -e RUNNER_LABELS=$RUNNER_LABELS \
+  #           -e RUNNER_REPO=$RUNNER_REPO \
+  #           -e RUNNER_IDLE_TIMEOUT=120 \
+  #           davidgortega/cml:tf3 && \
+
+  #         sleep 20 && echo "Deployed $MACHINE"
+  #         ) || (docker-machine rm -f $MACHINE && exit 1)
+
+  # ml-azure-gpu:
+  #   needs: deploy-azure-gpu
+  #   runs-on: [self-hosted,azure]
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "Training..."
+  #         echo 'Hi from azure!' >> report.md
+  #         nvidia-smi >> report.md
+  #         cml-send-comment report.md
+
+  #         # pip3 install -r requirements.txt
+  #         # python train.py
+          
+  #         echo "Trained!"
+
+
+  # deploy-azure:
+  #   runs-on: [ubuntu-latest]
+  #   container: docker://davidgortega/cml-runner:latest
+
+  #   steps:
+  #     - name: deploy
+  #       shell: bash
+  #       env:
+  #         repo_token: ${{ secrets.REPO_TOKEN }} 
+  #         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  #         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  #         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #       run: |
+  #         echo "Deploying..."
+
+  #         RUNNER_LABELS="azure"
+  #         RUNNER_REPO="https://github.com/${GITHUB_REPOSITORY}"
+  #         MACHINE="cml$(date +%s)"
+
+  #         docker-machine create \
+  #           --driver azure \
+  #           --azure-client-id $AZURE_CLIENT_ID \
+  #           --azure-client-secret $AZURE_CLIENT_SECRET \
+  #           --azure-subscription-id $AZURE_SUBSCRIPTION_ID \
+  #           --azure-size "Standard_NC6" \
+  #           --azure-image Canonical:UbuntuServer:18.04-LTS:latest \
+  #           --azure-location "eastus" \
+  #           --azure-resource-group $MACHINE \
+  #           $MACHINE
+
+  #         eval "$(docker-machine env --shell sh $MACHINE)" &&
+
+  #         docker run --name runner \
+  #           -v /docker_machine/machine:/root/.docker/machine \
+  #           -e DOCKER_MACHINE=$MACHINE \
+  #           -e repo_token=$repo_token \
+  #           -e RUNNER_LABELS=$RUNNER_LABELS \
+  #           -e RUNNER_REPO=$RUNNER_REPO \
+  #           -e RUNNER_IDLE_TIMEOUT=300 \
+  #           davidgortega/cml-runner:latest &&
+
+  #         docker-machine rm -f $MACHINE
+
+  # # register-runner:
+  # #   runs-on: [ubuntu-latest]
+  # #   container: docker://davidgortega/cml-runner:latest
+
+  # #   steps:
+  # #     - name: deploy
+  # #       shell: bash
+  # #       env:
+  # #         repo_token: ${{ secrets.REPO_TOKEN }} 
+  # #       run: |
+  # #         RUNNER_LABELS="azure"
+  # #         RUNNER_REPO="https://github.com/${GITHUB_REPOSITORY}"
+
+  # #         docker run --name runner \
+  # #           -e repo_token=$repo_token \
+  # #           -e RUNNER_LABELS=$RUNNER_LABELS \
+  # #           -e RUNNER_REPO=$RUNNER_REPO \
+  # #           -e RUNNER_IDLE_TIMEOUT=1 \
+  # #           -e RUNNER_UNREGISTER=n \
+  # #           -e RUNNER_NAME=runner \
+  # #           davidgortega/cml-runner:latest
+
+  # #         sleep 30
+
+  # ml-azure:
+  #   # needs: register-runner
+  #   runs-on: [self-hosted,azure]
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "Training..."
+  #         echo 'Hi from azure!' >> report.md
+  #         echo "Trained!"
+
+
+  # deploy-aws:
+  #   runs-on: [ubuntu-latest]
+  #   container: docker://dvcorg/cml-cloud-runner:latest
+
+  #   steps:
+  #     - name: deploy
+  #       shell: bash
+  #       env:
+  #         repo_token: ${{ secrets.REPO_TOKEN }} 
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       run: |
+  #         echo "Deploying..."
+
+  #         RUNNER_LABELS="aws"
+  #         RUNNER_REPO="https://github.com/DavidGOrtega/3_tensorboard"
+  #         MACHINE="cml$(date +%s)"
+
+  #         docker-machine create \
+  #           --driver amazonec2 \
+  #           --amazonec2-instance-type g4dn.xlarge \
+  #           --amazonec2-vpc-id vpc-06bc773d85a0a04f7 \
+  #           --amazonec2-ssh-user ubuntu \
+  #           --amazonec2-ami ami-085925f297f89fce1 \
+  #           $MACHINE
+
+  #         eval "$(docker-machine env --shell sh $MACHINE)"
+
+  #         (
+  #         docker-machine ssh $MACHINE "sudo mkdir -p /docker_machine && sudo chmod 777 /docker_machine" && \
+  #         docker-machine scp -r -q ~/.docker/machine/ $MACHINE:/docker_machine && \
+
+  #         docker run --name runner --gpus all -d \
+  #           -v /docker_machine/machine:/root/.docker/machine \
+  #           -e DOCKER_MACHINE=$MACHINE \
+  #           -e repo_token=$repo_token \
+  #           -e RUNNER_LABELS=$RUNNER_LABELS \
+  #           -e RUNNER_REPO=$RUNNER_REPO \
+  #           -e RUNNER_IDLE_TIMEOUT=120 \
+  #           dvcorg/cml-cloud-runner:latest && \
+
+  #         sleep 20 && echo "Deployed $MACHINE"
+  #         ) || (docker-machine rm -f $MACHINE && exit 1)
+
+  # ml-aws:
+  #   needs: deploy-aws
+  #   runs-on: [self-hosted,aws]
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "Training..."
+  #         echo 'Hi from aws!' >> report.md
+  #         cml-send-comment report.md
+  #         echo "Trained!"
+
+
+  # deploy-gce:
+  #   runs-on: [ubuntu-latest]
+  #   container: docker://davidgortega/cml-runner2:latest
+
+  #   steps:
+  #     - name: deploy
+  #       shell: bash
+  #       env:
+  #         repo_token: ${{ secrets.REPO_TOKEN }} 
+  #         GOOGLE_APPLICATION_CREDENTIALS_DATA: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_DATA }}
+  #       run: |
+  #         echo "Deploying..."
+
+  #         echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_DATA }}' > gce-credentials.json
+  #         export GOOGLE_APPLICATION_CREDENTIALS='gce-credentials.json'
+
+  #         RUNNER_LABELS="gce"
+  #         RUNNER_REPO="https://github.com/DavidGOrtega/3_tensorboard"
+  #         MACHINE="cml$(date +%s)"
+
+  #         docker-machine create --driver google \
+  #           --google-machine-type "n1-standard-4" \
+  #           --google-project "cml-project-279709" \
+  #           --google-machine-image "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts" \
+  #           --google-accelerator-type "nvidia-tesla-p100" \
+  #           --google-accelerator-count 1 \
+  #           --google-zone "us-central1-a" \
+  #           $MACHINE
+
+  #         eval "$(docker-machine env --shell sh $MACHINE)"
+
+  #         (
+  #         docker-machine ssh $MACHINE "sudo mkdir -p /docker_machine && sudo chmod 777 /docker_machine" && \
+  #         docker-machine scp -r -q ~/.docker/machine/ $MACHINE:/docker_machine && \
+
+  #         docker-machine scp -q gce-credentials.json $MACHINE:/docker_machine/gce-credentials.json && \
+
+  #         docker-machine ssh $MACHINE "sudo apt update && sudo apt install -y ubuntu-drivers-common && sudo ubuntu-drivers autoinstall" && \
+  #         docker-machine ssh $MACHINE "curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - && curl -s -L https://nvidia.github.io/nvidia-docker/ubuntu18.04/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list && sudo apt update && sudo apt install -y nvidia-container-toolkit && \
+  #         docker-machine restart $MACHINE && \
+  #         eval "$(docker-machine env --shell sh $MACHINE)" && \
+
+  #         docker run --name runner --gpus all -d \
+  #           -v /docker_machine/machine:/root/.docker/machine \
+  #           -e DOCKER_MACHINE=$MACHINE \
+  #           -e repo_token=$repo_token \
+  #           -e RUNNER_LABELS=$RUNNER_LABELS \
+  #           -e RUNNER_REPO=$RUNNER_REPO \
+  #           -e RUNNER_IDLE_TIMEOUT=30 \
+  #           -v /docker_machine/gce-credentials.json:/gce-credentials.json \
+  #           -e GOOGLE_APPLICATION_CREDENTIALS='/gce-credentials.json' \
+  #           davidgortega/cml-runner2:latest && \
+
+  #         sleep 20 && echo "Deployed $MACHINE"
+  #         ) || (docker-machine rm -f $MACHINE && exit 1)
+
+  # ml-gce:
+  #   needs: deploy-gce
+  #   runs-on: [self-hosted,gce]
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "Training..."
+  #         echo 'Hi from Google Cloud!' >> report.md
+  #         nvidia-smi >> report.md
+  #         cml-send-comment report.md
+  #         echo "Trained!"
+
+  # run:
+  #   # docker://davidgortega/cml-pyv3
+  #   #runs-on: [self-hosted,gpu]
+    
+  #   runs-on: [ubuntu-latest]
+  #   container:
+  #     image: docker://davidgortega/cml-dev:contrib
+  #     # volumes:
+  #     #   - /opt/hostedtoolcache:/opt/hostedtoolcache
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+      
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.x'
+          
+  #     - name: Display Python version
+  #       run: python -c "import sys; print(sys.version)"
+
+# jobs:
+#   run:
+#     runs-on: [ubuntu-18.04]
+#     container: docker://dvcorg/cml-test
+#     # container: ubuntu:18.04
+#     steps:
+#       - uses: actions/checkout@v2
+
+#       # - name: apt
+#       #   run: |
+#       #       #echo 'APT::Get::Assume-Yes "true";\nAPT::Get::allow-downgrades "true";\nAPT::Get::allow-remove-essential "true";\nAPT::Get::allow-change-held-packages "true";' >> /etc/apt/apt.conf.d/90forceyes
+#       #       echo "APT::Get::Assume-Yes \"true\";" > /etc/apt/apt.conf.d/90assumeyes
+            
+#       # - name: sudo
+#       #   run: |
+#       #       apt-get update && apt-get install sudo software-properties-common tzdata
+#       #       # ln -fs /usr/share/zoneinfo/US/Pacific-New /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
+
+#       - uses: r-lib/actions/setup-r@master
+#       - name: cml_run
+#         env:
+#           repo_token: ${{ secrets.repo_token }}
+#         run: |
+#           # Install miic and dependencies
+#           # wget -c https://github.com/miicTeam/miic_R_package/archive/v1.4.2.tar.gz
+#           # tar -xvzf v1.4.2.tar.gz
+#           # cd miic_R_package-1.4.2
+#           # R --silent -e "install.packages(c(\"igraph\", \"ppcor\", \"scales\", \"Rcpp\"))"
+#           # R CMD INSTALL . --preclean
+#           # cd ..
+#           # Write your CML report
+#           # echo "## Model Metrics" > report.md
+#           # cml-send-comment report.md
+#           echo 'Works'
+
+# env:
+#   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+# jobs:
+#   terraform:
+#     runs-on: [ubuntu-18.04]
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: hashicorp/setup-terraform@v1
+#       - uses: actions/cache@v2
+#         with:
+#           path: terraform.tfstate
+#           key: terraform
+
+#       - name: cml_run
+#         run: |
+#           rm terraform.tfstate
+#           terraform init  
+#           terraform plan --out plan
+#           terraform apply -auto-approve
+
+#   terraform-ends:
+#     runs-on: [ubuntu-18.04]
+#     needs: terraform
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: hashicorp/setup-terraform@v1
+#       - uses: actions/cache@v2
+#         with:
+#           path: terraform.tfstate
+#           key: terraform
+
+#       - name: cml_run
+#         run: |
+#           terraform init  
+#           terraform destroy -auto-approve  
+        
   deploy-tf:
     runs-on: [ubuntu-latest]
+    #runs-on: [ubuntu-18.04]
+    container: docker://dvcorg/cml:latest
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: iterative/setup-cml@v1
+      #- uses: iterative/setup-cml@v1
 
       - name: deploy
         shell: bash
@@ -20,20 +411,58 @@ jobs:
         run: |
           test-cml-cloud-runner \
           --labels=tf \
-          --idle-timeout=120 \
           --type=t2.micro \
-          --region us-west
-          
+          --region us-west-1 \
+          --idle-timeout=120
+
   train:
     needs: deploy-tf
     runs-on: [self-hosted,tf]
-
+    #runs-on: [ubuntu-18.04]
     steps:
       - uses: actions/checkout@v2
 
       - name: cml_run
         env:
-          repo_token: ${{ secrets.REPO_TOKEN }} 
+          repo_token: ${{ secrets.GITHUB_TOKEN }} 
         run: |
           echo "Training..."
+          
+          #sleep 600 
           echo 'Hi from cml! END message' >> report.md
+          # nvidia-smi >> report.md
+
+  #         cml-send-comment report.md
+  #         echo "Trained!"
+
+  # hello:
+  #   runs-on: [self-hosted, test,unregister]
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "hello world from branch!" > report.md
+  #         cml-send-comment report.md
+
+  # cml-tests:
+  #   runs-on: [ubuntu-latest]
+  #   container: docker://davidgortega/cml:contexts
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }} 
+  #       run: |
+  #         echo "My test experiment" > report.md
+  #         # cml-tensorboard-dev --md --title 'goto to TB' --logdir logs --name 'My Experiment' --description 'This is my test experiment' >> report.md
+  #         cml-publish --md --title 'my logo' assets/test.svg >> report.md
+  #         cml-publish --md --title 'my file' assets/logo.pdf >> report.md
+  #         cml-send-comment report.md
+
+  #         echo "This must be seen in gitlab" >> report.md
+  #         cml-send-comment --repo https://gitlab.com/DavidGOrtega/3_tensorboard --token $GITLAB_TOKEN --commit-sha 2dc250a9 report.md 
