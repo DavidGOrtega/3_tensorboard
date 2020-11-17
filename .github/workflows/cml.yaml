@@ -395,12 +395,12 @@ jobs:
   deploy-tf:
     runs-on: [ubuntu-latest]
     #runs-on: [ubuntu-18.04]
-    container: docker://dvcorg/cml:latest
+    #container: docker://dvcorg/cml:latest
 
     steps:
       - uses: actions/checkout@v2
 
-      #- uses: iterative/setup-cml@v1
+      - uses: iterative/setup-cml@v1
 
       - name: deploy
         shell: bash
