@@ -413,27 +413,28 @@ jobs:
           --labels=tf \
           --type=t2.micro \
           --region us-west-1 \
-          --idle-timeout=120
+          --idle-timeout=120 \
+          --attached
 
-  train:
-    needs: deploy-tf
-    runs-on: [self-hosted,tf]
-    #runs-on: [ubuntu-18.04]
-    steps:
-      - uses: actions/checkout@v2
+  # train:
+  #   needs: deploy-tf
+  #   runs-on: [self-hosted,tf]
+  #   #runs-on: [ubuntu-18.04]
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: cml_run
-        env:
-          repo_token: ${{ secrets.GITHUB_TOKEN }} 
-        run: |
-          echo "Training..."
+  #     - name: cml_run
+  #       env:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }} 
+  #       run: |
+  #         echo "Training..."
           
-          #sleep 600 
-          echo 'Hi from cml! END message' >> report.md
-          # nvidia-smi >> report.md
+  #         #sleep 600 
+  #         echo 'Hi from cml! END message' >> report.md
+  #         # nvidia-smi >> report.md
 
-  #         cml-send-comment report.md
-  #         echo "Trained!"
+  # #         cml-send-comment report.md
+  # #         echo "Trained!"
 
   # hello:
   #   runs-on: [self-hosted, test,unregister]
