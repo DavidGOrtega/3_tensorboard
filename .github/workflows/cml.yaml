@@ -446,8 +446,9 @@ jobs:
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }} 
         run: |
-          vl2png
           dvc --version
+          vl2png
+          
           echo "hello world from branch!" > report.md
           cml-send-comment report.md
 
