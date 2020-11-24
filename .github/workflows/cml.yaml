@@ -438,7 +438,7 @@ jobs:
 
   hello:
     runs-on: [ubuntu-latest]
-    container: docker://davidgortega/cml:vega
+    container: docker://dvcorg/cml:latest
     steps:
       - uses: actions/checkout@v2
 
