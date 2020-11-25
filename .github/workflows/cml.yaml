@@ -449,6 +449,7 @@ jobs:
           # dvc get https://github.com/iterative/example-get-started model.pkl
           # ls
           git rev-parse HEAD
+          git rev-parse --abbrev-ref HEAD 
 
   # cml-tests:
   #   runs-on: [ubuntu-latest]
