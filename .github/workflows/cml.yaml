@@ -25,7 +25,6 @@ jobs:
           --type=t2.micro \
           --region us-west-1 \
           --idle-timeout=120
-          --attached
 
   train:
     needs: deploy-tf
